@@ -1,0 +1,30 @@
+
+.header {
+    background-color: #F4D3FF;
+    border: $border-dark;
+    border-radius: 15px;
+}
+
+.header__container {
+    @include flexible(space-between, center);
+
+    padding: 21px 20px;
+}
+
+.header__title {
+    @include font(30px, 37px);
+
+    &:first-letter {
+        text-transform: uppercase;
+    }
+}
+
+.header__time {
+    @include flexible(center, center);
+
+    background-color: #fff;
+    border: $border-dark;
+    border-radius: 10px;
+    height: 45px;
+    width: 100px;
+}

@@ -1,0 +1,74 @@
+$border-dark: 1px solid #000;
+
+@mixin font($size, $line-height) {
+    font-size: $size;
+    line-height: $line-height;
+}
+
+@mixin flexible($justify, $align) {
+    display: flex;
+    justify-content: $justify;
+    align-items: $align;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+
+@import "./_header";
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul,
+ol,
+li {
+    list-style: none;
+}
+
+img {
+    vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: inherit;
+    font-size: inherit;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height: 100%;
+    overflow: hidden;
+}
+
+.trello {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400px;
+    color: #000;
+}
+
+.trello__container {
+    max-width: 1170px;
+    margin: auto;
+    padding: 30px 15px;
+}
