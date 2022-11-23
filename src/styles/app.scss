@@ -1,4 +1,7 @@
 $border-dark: 1px solid #000;
+$color-gray: #E8E6E6;
+$color-blue: #C4DFF8;
+$color-green: #CAF6D4;
 
 @mixin font($size, $line-height) {
     font-size: $size;
@@ -14,6 +17,10 @@ $border-dark: 1px solid #000;
 @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
 
 @import "./_header";
+
+@import "./columns";
+
+@import "./add";
 
 *,
 *::before,
@@ -46,6 +53,11 @@ h5,
 h6 {
     font-weight: inherit;
     font-size: inherit;
+    margin: 0;
+}
+
+textarea {
+    resize: none;
 }
 
 html {
@@ -70,5 +82,5 @@ body {
 .trello__container {
     max-width: 1170px;
     margin: auto;
-    padding: 30px 15px;
+    padding: 10px 15px;
 }

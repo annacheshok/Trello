@@ -1,0 +1,84 @@
+.modal-dialog {
+    max-width: 570px;
+    background-color: $color-green;
+    border: $border-dark;
+    border-radius: 15px;
+}
+
+.modal-content {
+    color: inherit;
+    background-color: inherit;
+    border: 0;
+    padding: 30px 0;
+
+    @include font(15px, 18px);
+}
+
+.modal-dialog-centered {
+    min-height: fit-content;
+    margin-top:calc(50vh - 312px / 2);
+}
+
+.modal-content__container {
+    padding: 0 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content__title {
+    height: 30px;
+    width: 240px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+    text-align: center;
+    border: $border-dark;
+    border-radius: 5px;
+
+    &::placeholder {
+        color: black;
+    }
+}
+
+.modal-content__description {
+    height: 130px;
+    width: 490px;
+    margin-bottom: 30px;
+    text-align: center;
+    padding: 50px 15px;
+    border: $border-dark;
+    border-radius: 5px;
+
+    &::placeholder {
+        color: black;
+    }
+}
+
+#btn-confirm, #btn-cancel {
+    border: $border-dark;
+
+    @include font(15px, 18px);
+}
+
+#btn-select-user {
+    width: 150px;
+    margin-bottom: 0 !important;
+    border: $border-dark;
+
+    @include font(15px, 18px);
+}
+
+.modal-content__control {
+    position: relative;
+
+    @include flexible(end, center);
+}
+
+#btn-select-user {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#btn-cancel {
+    margin-right: 10px;
+}
