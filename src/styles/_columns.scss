@@ -39,6 +39,7 @@
 .columns-item__cards {
     margin: 10px;
 }
+
 .card {
     padding: 0 10px;
 }
@@ -53,7 +54,7 @@
     margin: 0;
 }
 
-#btn-select {
+.btn-select {
     width: 150px;
     margin-bottom: 0 !important;
     border: $border-dark;
@@ -62,14 +63,14 @@
     @include font(13px, 16px);
 }
 
-#btn-edit, #btn-delete {
+.btn-edit, .btn-delete {
     @include font(13px, 16px);
 
     border: $border-dark;
     text-transform: uppercase;
 }
 
-#btn-edit {
+.btn-edit {
     margin: 0 6px;
 }
 
@@ -101,3 +102,13 @@
     background-color: $color-green;
     border-radius: 0px 0px 15px 15px;
 }
+
+.btn-cancel {
+    margin-right: 10px;
+    border: $border-dark;
+}
+
+.btn-confirm {
+    border: $border-dark;
+}
+
