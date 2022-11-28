@@ -1,3 +1,5 @@
+// Ссылка на массив USERS
+const url = 'https://jsonplaceholder.typicode.com/users'
 
 // Ссылки на DOM элементы
 const cardsTodoElement = document.querySelector('.cards-todo')
@@ -9,6 +11,7 @@ const counterInProgressElement = document.querySelector('.columns-item__title-in
 const counterDoneElement = document.querySelector('.columns-item__title-done').querySelector('span')
 const modalAddElement = document.querySelector('#modal-add')
 const modalEditElement = document.querySelector('#modal-edit')
+const usersElement = document.querySelectorAll('#btn-select-user')
 const buttonCancelInModalElement = document.querySelectorAll('.btn-cancel')
 
 // Забираем карточки из хранилища
@@ -127,6 +130,19 @@ function isEmpty(str) {
     }
 }
 
+// FETCH
+fetch(url)
+    .then(response => {
+        return response.json()
+    })
+    .then((data) => {
+        renderUser(data)
+    })
+    .catch((error) => {
+        console.log(`Error: ${error}`)
+    })
+
+
 // Обновление хранилища колонки TODO
 function updateLocalStorageTodo() {
     localStorage.setItem('todo', JSON.stringify(todo))
@@ -140,6 +156,18 @@ function updateLocalStorageInProgress() {
 // Обновление хранилища колонки DONE
 function updateLocalStorageDone() {
     localStorage.setItem('done', JSON.stringify(done))
+}
+
+// Отрисовка USERS
+function renderUser(data) {
+    let html = `<option selected hidden>Select user</option>`
+    data.forEach(item => {
+        const template = buildUserTemplate(item)
+        html = html + template
+    })
+    usersElement.forEach(element => {
+        element.innerHTML = html
+    })
 }
 
 // Отрисовка карточек TODO
@@ -217,6 +245,11 @@ function buildItemTemplate(payload) {
             </div>`
 }
 
+// Шаблон для карточки User
+function buildUserTemplate(payload) {
+    return `<option value=${payload.id}>${payload.name}</option>`
+}
+
 // Очистка формы после отмены добавления карточки
 function handleCancelModal(event) {
     const modal = event.target.closest('.modal-content__container')
@@ -290,9 +323,10 @@ function handleClickButtonEditItem(event) {
             const closestElement = target.closest('.card-todo')
             const id = closestElement.id
             const item = todo.find(el => el.id == id)
-
             modalEditElement.querySelector('.modal-content__title').value = item.title
             modalEditElement.querySelector('.modal-content__description').value = item.description
+           //const user = usersElement[1].querySelectorAll('option').find(element => element.value == item.user)
+           //console.log(user)
             modalEditElement.querySelector('#btn-select-user').selectedIndex = 2
             var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
                 keyboard: false
