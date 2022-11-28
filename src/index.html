@@ -52,15 +52,15 @@
                                 <div class="cards cards-in-progress">
                                     <div class="card card-in-progress">
                                         <div class="card__control">
-                                            <select class="form-select form-select-lg mb-3"
-                                                aria-label=".form-select-lg example" id="btn-select">
+                                            <select class="form-select form-select-lg mb-3 btn-select"
+                                                aria-label=".form-select-lg example">
                                                 <option selected hidden>select</option>
                                                 <option value="1">Todo</option>
                                                 <option value="2">In Progress</option>
                                                 <option value="3">Completed</option>
                                             </select>
-                                            <button type="button" class="btn btn-light" id="btn-edit">edit</button>
-                                            <button type="button" class="btn btn-light" id="btn-delete">delete</button>
+                                            <button type="button" class="btn btn-light btn-edit">edit</button>
+                                            <button type="button" class="btn btn-light btn-delete">delete</button>
                                         </div>
                                         <h3 class="card__title">
                                             Title
@@ -77,15 +77,15 @@
                                     </div>
                                     <div class="card card-in-progress">
                                         <div class="card__control">
-                                            <select class="form-select form-select-lg mb-3"
-                                                aria-label=".form-select-lg example" id="btn-select">
+                                            <select class="form-select form-select-lg mb-3 btn-select"
+                                                aria-label=".form-select-lg example">
                                                 <option selected hidden>select</option>
                                                 <option value="1">Todo</option>
                                                 <option value="2">In Progress</option>
                                                 <option value="3">Completed</option>
                                             </select>
-                                            <button type="button" class="btn btn-light" id="btn-edit">edit</button>
-                                            <button type="button" class="btn btn-light" id="btn-delete">delete</button>
+                                            <button type="button" class="btn btn-light btn-edit">edit</button>
+                                            <button type="button" class="btn btn-light btn-delete">delete</button>
                                         </div>
                                         <h3 class="card__title">
                                             Title
@@ -170,21 +170,45 @@
                     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form class="modal-content__container">
+                            <form class="modal-content__container" id="modal-add">
                                 <input type="text" placeholder="Title" class="modal-content__title">
                                 <textarea class="modal-content__description" placeholder="Description"></textarea>
                                 <div class="modal-content__control">
-                                    <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example"
-                                        id="btn-select-user">
+                                    <select required class="form-select form-select-lg mb-3"
+                                        aria-label=".form-select-lg example" id="btn-select-user">
                                         <option selected hidden>Select user</option>
                                         <option value="1">Anna</option>
                                         <option value="2">Masha</option>
                                         <option value="3">Sasha</option>
                                         <option value="4">Kolya</option>
                                     </select>
-                                    <button type="button" class="btn btn-light" id="btn-cancel"
+                                    <button type="button" class="btn btn-light btn-cancel"
                                         data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-light" id="btn-confirm"
+                                    <button type="submit" class="btn btn-light btn-confirm"
+                                        data-bs-dismiss="modal">Confirm</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade modal-edit" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form class="modal-content__container" id="modal-edit">
+                                <input type="text" placeholder="Title" class="modal-content__title">
+                                <textarea class="modal-content__description" placeholder="Description"></textarea>
+                                <div class="modal-content__control">
+                                    <select required class="form-select form-select-lg mb-3"
+                                        aria-label=".form-select-lg example" id="btn-select-user">
+                                        <option value="1">Anna</option>
+                                        <option value="2">Masha</option>
+                                        <option value="3">Sasha</option>
+                                        <option value="4">Kolya</option>
+                                    </select>
+                                    <button type="button" class="btn btn-light btn-cancel"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-light btn-confirm"
                                         data-bs-dismiss="modal">Confirm</button>
                                 </div>
                             </form>

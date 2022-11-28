@@ -1,14 +1,15 @@
 
 // Ссылки на DOM элементы
-
 const cardsTodoElement = document.querySelector('.cards-todo')
 const cardsInProgressElement = document.querySelector('.cards-in-progress')
 const cardsDoneElement = document.querySelector('.cards-done')
+const allCardsElement = document.querySelector('.columns')
 const counterTodoElement = document.querySelector('.columns-item__title-todo').querySelector('span')
 const counterInProgressElement = document.querySelector('.columns-item__title-in-progress').querySelector('span')
 const counterDoneElement = document.querySelector('.columns-item__title-done').querySelector('span')
-const modalAddElement = document.querySelector('.modal-content__container')
-console.log(modalAddElement)
+const modalAddElement = document.querySelector('#modal-add')
+const modalEditElement = document.querySelector('#modal-edit')
+const buttonCancelInModalElement = document.querySelectorAll('.btn-cancel')
 
 // Забираем карточки из хранилища
 function getTodoFromStorage() {
@@ -55,7 +56,6 @@ function getDoneFromStorage() {
     return result
 }
 
-
 // Массив с объектами карточек TODO
 const todo = getTodoFromStorage()
 // Массив с объектами карточек IN PROGRESS
@@ -88,6 +88,44 @@ function countDoneAll() {
     return done.length
 }
 
+// Функция для удаления пользователя TODO по id 
+function removeTodoById(id) {
+    todo.forEach((item, index) => {
+
+        if (item.id == id) {
+            todo.splice(index, 1)
+        }
+    })
+}
+
+// Функция для удаления пользователя IN PROGRESS по id 
+function removeInProgressById(id) {
+    inProgress.forEach((item, index) => {
+
+        if (item.id == id) {
+            todo.splice(index, 1)
+        }
+    })
+}
+
+// Функция для удаления пользователя DONE по id 
+function removeDoneById(id) {
+    done.forEach((item, index) => {
+
+        if (item.id == id) {
+            done.splice(index, 1)
+        }
+    })
+}
+
+// Функция для проверки на пустоту поля
+function isEmpty(str) {
+    if (/^\s*$/.test(str)) {
+        return true
+    } else {
+        return false
+    }
+}
 
 // Обновление хранилища колонки TODO
 function updateLocalStorageTodo() {
@@ -150,18 +188,19 @@ function ToDo(title, description, user) {
 
 // Шаблон для карточки
 function buildItemTemplate(payload) {
-
-    return `<div class="card card-todo id=${payload.id}">
+    const todo = payload.status == 'todo' ? 'selected' : ''
+    const inProgress = payload.status == 'inProgress' ? 'selected' : ''
+    const done = payload.status == 'done' ? 'selected' : ''
+    return `<div class="card card-todo" id=${payload.id}>
                 <div class="card__control">
-                    <select class="form-select form-select-lg mb-3"
-                    aria-label=".form-select-lg example" id="btn-select">
-                        <option selected hidden>select</option>
-                        <option value="1">Todo</option>
-                        <option value="2">In Progress</option>
-                        <option value="3">Completed</option>
+                    <select class="form-select form-select-lg mb-3 btn-select"
+                    aria-label=".form-select-lg example">
+                        <option ${todo} value="1">Todo</option>
+                        <option ${inProgress} value="2">In Progress</option>
+                        <option ${done} value="3">Completed</option>
                      </select>
-                    <button type="button" class="btn btn-light" id="btn-edit">edit</button>
-                    <button type="button" class="btn btn-light" id="btn-delete">delete</button>
+                    <button type="button" class="btn btn-light btn-edit">edit</button>
+                    <button type="button" class="btn btn-light btn-delete">delete</button>
                 </div>
                 <h3 class="card__title">
                     ${payload.title}
@@ -178,9 +217,14 @@ function buildItemTemplate(payload) {
             </div>`
 }
 
+// Очистка формы после отмены добавления карточки
+function handleCancelModal(event) {
+    const modal = event.target.closest('.modal-content__container')
+    modal.reset()
+}
 
 // Получение текущего времени
-function handleClock () {
+function handleClock() {
     setInterval(() => {
         let date = new Date(),
             hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours(),
@@ -190,18 +234,103 @@ function handleClock () {
 }
 
 // Добавление карточки
-function handleAddCard (event) {
+function handleAddCard(event) {
     event.preventDefault()
     const titleCardElement = document.querySelector('.modal-content__title')
     const descriptionCardElement = document.querySelector('.modal-content__description')
     const userCardValueElement = document.querySelector('#btn-select-user')
-    const user = userCardValueElement.options[userCardValueElement.selectedIndex].text;
-    const card = new ToDo(titleCardElement.value, descriptionCardElement.value, user )
-    todo.push(card)
+    const user = userCardValueElement.options[userCardValueElement.selectedIndex].text
+
+    if (!isEmpty(titleCardElement.value) && !isEmpty(descriptionCardElement.value) && userCardValueElement.selectedIndex != 0) {
+        const card = new ToDo(titleCardElement.value, descriptionCardElement.value, user)
+        todo.push(card)
+        updateLocalStorageTodo()
+        renderTodo()
+    }
     modalAddElement.reset()
-    updateLocalStorageTodo()
-    renderTodo()
 }
+
+// Обработчик события на кнопку "Delete" у карточки
+function handleClickButtonRemoveItem(event) {
+    const target = event.target
+    if (target.classList.contains('btn-delete')) {
+
+        if (target.closest('.card-todo')) {
+            const closestElement = target.closest('.card-todo')
+            const id = closestElement.id
+            removeTodoById(id)
+            updateLocalStorageTodo()
+            renderTodo()
+        }
+
+        else if (target.closest('.card-in-progress')) {
+            const closestElement = target.closest('.card-in-progress')
+            const id = closestElement.id
+            removeInProgressById(id)
+            updateLocalStorageInProgress()
+            renderInProgress()
+        }
+
+        else if (target.closest('.card-done')) {
+            const closestElement = target.closest('.card-done')
+            const id = closestElement.id
+            removeDoneById(id)
+            updateLocalStorageDone()
+            renderDone()
+        }
+    }
+}
+
+// Обработчик события на кнопку "Edit" у карточки
+function handleClickButtonEditItem(event) {
+    const target = event.target
+    if (target.classList.contains('btn-edit')) {
+
+        if (target.closest('.card-todo')) {
+            const closestElement = target.closest('.card-todo')
+            const id = closestElement.id
+            const item = todo.find(el => el.id == id)
+
+            modalEditElement.querySelector('.modal-content__title').value = item.title
+            modalEditElement.querySelector('.modal-content__description').value = item.description
+            modalEditElement.querySelector('#btn-select-user').selectedIndex = 2
+            var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
+                keyboard: false
+            })
+            myModal.show()
+            //updateLocalStorageTodo()
+            // renderTodo()
+        }
+        /*
+                else if (target.closest('.card-in-progress')) {
+                    const closestElement = target.closest('.card-in-progress')
+                    const id = closestElement.id
+                    removeInProgressById(id)
+                    updateLocalStorageInProgress()
+                    renderInProgress()
+                }
+        
+                else if (target.closest('.card-done')) {
+                    const closestElement = target.closest('.card-done')
+                    const id = closestElement.id
+                    removeDoneById(id)
+                    updateLocalStorageDone()
+                    renderDone()
+                }*/
+    }
+
+}
+
 
 window.addEventListener('DOMContentLoaded', handleClock)
 modalAddElement.addEventListener('submit', handleAddCard)
+cardsTodoElement.addEventListener('click', handleClickButtonRemoveItem)
+allCardsElement.addEventListener('click', handleClickButtonRemoveItem)
+allCardsElement.addEventListener('click', handleClickButtonEditItem)
+buttonCancelInModalElement.forEach(item => {
+    console.log(item)
+    item.addEventListener('click', handleCancelModal)
+})
+renderTodo()
+renderInProgress()
+renderDone()
