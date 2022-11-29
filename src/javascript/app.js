@@ -60,11 +60,11 @@ function getDoneFromStorage() {
 }
 
 // Массив с объектами карточек TODO
-const todo = getTodoFromStorage()
+let todo = getTodoFromStorage()
 // Массив с объектами карточек IN PROGRESS
-const inProgress = getInProgressFromStorage()
+let inProgress = getInProgressFromStorage()
 // Массив с объектами карточек DONE
-const done = getDoneFromStorage()
+let done = getDoneFromStorage()
 
 
 // Первоначальная отрисовка
@@ -106,7 +106,7 @@ function removeInProgressById(id) {
     inProgress.forEach((item, index) => {
 
         if (item.id == id) {
-            todo.splice(index, 1)
+            inProgress.splice(index, 1)
         }
     })
 }
@@ -216,13 +216,28 @@ function ToDo(title, description, user) {
 
 // Шаблон для карточки
 function buildItemTemplate(payload) {
-    const todo = payload.status == 'todo' ? 'selected' : ''
-    const inProgress = payload.status == 'inProgress' ? 'selected' : ''
-    const done = payload.status == 'done' ? 'selected' : ''
-    return `<div class="card card-todo" id=${payload.id}>
+    let todo = ''
+    let inProgress = ''
+    let done = ''
+    let classCard = ''
+
+    let card = JSON.stringify(payload)
+
+    if (localStorage.getItem('todo').includes(card)) {
+        todo = 'selected'
+        classCard = 'card-todo'
+    } else if (localStorage.getItem('inProgress').includes(card)) {
+        inProgress = 'selected'
+        classCard = 'card-in-progress'
+    } else if (localStorage.getItem('done').includes(card)) {
+        done = 'selected'
+        classCard = 'card-done'
+    }
+
+    return `<div class="card ${classCard}" id=${payload.id}>
                 <div class="card__control">
                     <select class="form-select form-select-lg mb-3 btn-select"
-                    aria-label=".form-select-lg example">
+                    aria-label=".form-select-lg example" >
                         <option ${todo} value="1">Todo</option>
                         <option ${inProgress} value="2">In Progress</option>
                         <option ${done} value="3">Completed</option>
@@ -322,49 +337,178 @@ function handleClickButtonEditItem(event) {
         if (target.closest('.card-todo')) {
             const closestElement = target.closest('.card-todo')
             const id = closestElement.id
-            const item = todo.find(el => el.id == id)
+            let item = todo.find(el => el.id == id)
+            const users = usersElement[1].querySelectorAll('option')
             modalEditElement.querySelector('.modal-content__title').value = item.title
             modalEditElement.querySelector('.modal-content__description').value = item.description
-           //const user = usersElement[1].querySelectorAll('option').find(element => element.value == item.user)
-           //console.log(user)
-            modalEditElement.querySelector('#btn-select-user').selectedIndex = 2
+            for (let el = 0; el < users.length; el++) {
+                if (users[el].text == item.user) {
+                    users[el].selected = true
+                }
+            }
+
             var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
                 keyboard: false
             })
             myModal.show()
-            //updateLocalStorageTodo()
-            // renderTodo()
+
+            const titleCardElement = modalEditElement.querySelector('.modal-content__title')
+            const descriptionCardElement = modalEditElement.querySelector('.modal-content__description')
+            const userCardValueElement = document.querySelectorAll('#btn-select-user')
+            userCardValueElement[1].options[userCardValueElement[1].selectedIndex].selected = true
+            const user = userCardValueElement[1].options[userCardValueElement[1].selectedIndex].text
+            alert(user)
+            modalEditElement.addEventListener('submit', function () {
+                item.title = titleCardElement.value
+                item.description = descriptionCardElement.value
+                item.user = user
+                alert(user)
+                alert(item.user)
+                updateLocalStorageTodo()
+                renderTodo()
+                modalEditElement.reset()
+            })
         }
-        /*
-                else if (target.closest('.card-in-progress')) {
-                    const closestElement = target.closest('.card-in-progress')
-                    const id = closestElement.id
-                    removeInProgressById(id)
+    }
+    /*
+            else if (target.closest('.card-in-progress')) {
+                const closestElement = target.closest('.card-in-progress')
+                const id = closestElement.id
+                removeInProgressById(id)
+                updateLocalStorageInProgress()
+                renderInProgress()
+            }
+    
+            else if (target.closest('.card-done')) {
+                const closestElement = target.closest('.card-done')
+                const id = closestElement.id
+                removeDoneById(id)
+                updateLocalStorageDone()
+                renderDone()
+            }*/
+}
+
+// Обработчик события смену колонки у карточки
+function handleClickButtonChangeColumnItem (event) {
+    const target = event.target
+    if (target.classList.contains('btn-select')) {
+
+        if (target.closest('.card-todo')) {
+            const closestElement = target.closest('.card-todo')
+            const columns = closestElement.querySelector('.btn-select')
+            if (columns.selectedIndex != 0) {
+
+                const id = closestElement.id
+                let item = todo.find(el => el.id == id)
+                let index = -1
+                let count = 0
+                todo.forEach(item => {
+                    if (item.id == id) {
+                        index = count
+                    }
+                    count++
+                })
+                if (columns.selectedIndex == 1) {
+                    todo.splice(index, 1)
+                    inProgress.push(item)
+                    updateLocalStorageTodo()
                     updateLocalStorageInProgress()
+                    renderTodo()
+                    renderInProgress()
+                } 
+                else if (columns.selectedIndex == 2) {
+                    todo.splice(index, 1)
+                    done.push(item)
+                    updateLocalStorageTodo()
+                    updateLocalStorageDone()
+                    renderTodo()
+                    renderDone()
+                }
+            }
+        }
+        else if (target.closest('.card-in-progress')) {
+            const closestElement = target.closest('.card-in-progress')
+            const columns = closestElement.querySelector('.btn-select')
+            if (columns.selectedIndex != 1) {
+
+                const id = closestElement.id
+                let item = inProgress.find(el => el.id == id)
+                let index = -1
+                let count = 0
+                inProgress.forEach(item => {
+                    if (item.id == id) {
+                        index = count
+                    }
+                    count++
+                })
+                if (columns.selectedIndex == 0) {
+                    inProgress.splice(index, 1)
+                    todo.push(item)
+                    updateLocalStorageInProgress()
+                    updateLocalStorageTodo()
+                    renderInProgress()
+                    renderTodo()
+                }
+                else if (columns.selectedIndex == 2) {
+                    inProgress.splice(index, 1)
+                    done.push(item)
+                    updateLocalStorageInProgress()
+                    updateLocalStorageDone()
+                    renderInProgress()
+                    renderDone()
+                }
+            }
+        }
+        else if (target.closest('.card-done')) {
+            const closestElement = target.closest('.card-done')
+            const columns = closestElement.querySelector('.btn-select')
+            if (columns.selectedIndex != 2) {
+
+                const id = closestElement.id
+                let item = done.find(el => el.id == id)
+                let index = -1
+                let count = 0
+                done.forEach(item => {
+                    if (item.id == id) {
+                        index = count
+                    }
+                    count++
+                })
+                if (columns.selectedIndex == 0) {
+                    done.splice(index, 1)
+                    todo.push(item)
+                    updateLocalStorageDone()
+                    updateLocalStorageTodo()
+                    renderDone()
+                    renderTodo()
+                }
+                else if (columns.selectedIndex == 1) {
+                    done.splice(index, 1)
+                    inProgress.push(item)
+                    updateLocalStorageDone()
+                    updateLocalStorageInProgress()
+                    renderDone()
                     renderInProgress()
                 }
-        
-                else if (target.closest('.card-done')) {
-                    const closestElement = target.closest('.card-done')
-                    const id = closestElement.id
-                    removeDoneById(id)
-                    updateLocalStorageDone()
-                    renderDone()
-                }*/
+            }
+        }
     }
-
 }
 
 
-window.addEventListener('DOMContentLoaded', handleClock)
+
+
 modalAddElement.addEventListener('submit', handleAddCard)
 cardsTodoElement.addEventListener('click', handleClickButtonRemoveItem)
 allCardsElement.addEventListener('click', handleClickButtonRemoveItem)
 allCardsElement.addEventListener('click', handleClickButtonEditItem)
+allCardsElement.addEventListener('click', handleClickButtonChangeColumnItem)
 buttonCancelInModalElement.forEach(item => {
-    console.log(item)
     item.addEventListener('click', handleCancelModal)
 })
+window.addEventListener('DOMContentLoaded', handleClock)
+
+
 renderTodo()
-renderInProgress()
-renderDone()
+ renderInProgress()
+ renderDone()
