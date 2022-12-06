@@ -554,12 +554,6 @@ function handleDeleteAllCard(event) {
     })
 }
 
-function handleEditSelectedItem(event) {
-    const target = event.target
-
-
-}
-
 modalAddElement.addEventListener('submit', handleAddCard)
 buttonDelAllItemElement.addEventListener('click', handleDeleteAllCard)
 cardsTodoElement.addEventListener('click', handleClickButtonRemoveItem)
