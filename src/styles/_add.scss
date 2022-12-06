@@ -16,7 +16,7 @@
 
 .modal-dialog-centered {
     min-height: fit-content;
-    margin-top:calc(50vh - 312px / 2);
+    margin-top: calc(50vh - 312px / 2);
 }
 
 .modal-content__container {
@@ -81,4 +81,35 @@
 
 #btn-cancel {
     margin-right: 10px;
+}
+
+.modal-in-progress .modal-dialog {
+    width: 200px;
+    .btn-confirm {
+        margin-left: 8px;
+    }
+}
+
+.modal-delete-all .modal-dialog {
+    width: 300px;
+}
+
+.modal-delete-all .modal-content__title {
+    border: none;
+    width: inherit;
+    margin-bottom: 20px;
+}
+
+.modal-delete-all .modal-content__control{
+    justify-content: space-between;
+}
+
+.modal-delete-all .btn-cancel, .btn-confirm {
+    width: 100px;
+}
+
+.modal-in-progress .modal-content__title {
+    border: none;
+    width: inherit;
+    margin-bottom: 20px;
 }

@@ -11,8 +11,12 @@ const counterInProgressElement = document.querySelector('.columns-item__title-in
 const counterDoneElement = document.querySelector('.columns-item__title-done').querySelector('span')
 const modalAddElement = document.querySelector('#modal-add')
 const modalEditElement = document.querySelector('#modal-edit')
+const selectEditElement = modalEditElement.querySelector('#btn-select-user')
+const modalDeleteAllElement = document.querySelector('#modal-delete-all')
+const modalInProgressElement = document.querySelector('#modal-in-progress')
 const usersElement = document.querySelectorAll('#btn-select-user')
 const buttonCancelInModalElement = document.querySelectorAll('.btn-cancel')
+const buttonDelAllItemElement = document.querySelector('#btn-del-all')
 
 // Забираем карточки из хранилища
 function getTodoFromStorage() {
@@ -262,7 +266,7 @@ function buildItemTemplate(payload) {
 
 // Шаблон для карточки User
 function buildUserTemplate(payload) {
-    return `<option value=${payload.id}>${payload.name}</option>`
+    return `<option value="${payload.name}">${payload.name}</option>`
 }
 
 // Очистка формы после отмены добавления карточки
@@ -287,10 +291,9 @@ function handleAddCard(event) {
     const titleCardElement = document.querySelector('.modal-content__title')
     const descriptionCardElement = document.querySelector('.modal-content__description')
     const userCardValueElement = document.querySelector('#btn-select-user')
-    const user = userCardValueElement.options[userCardValueElement.selectedIndex].text
 
-    if (!isEmpty(titleCardElement.value) && !isEmpty(descriptionCardElement.value) && userCardValueElement.selectedIndex != 0) {
-        const card = new ToDo(titleCardElement.value, descriptionCardElement.value, user)
+    if (!isEmpty(titleCardElement.value) || !isEmpty(descriptionCardElement.value) && userCardValueElement.selectedIndex != 0) {
+        const card = new ToDo(titleCardElement.value, descriptionCardElement.value, userCardValueElement.value)
         todo.push(card)
         updateLocalStorageTodo()
         renderTodo()
@@ -335,17 +338,14 @@ function handleClickButtonEditItem(event) {
     if (target.classList.contains('btn-edit')) {
 
         if (target.closest('.card-todo')) {
+
             const closestElement = target.closest('.card-todo')
             const id = closestElement.id
-            let item = todo.find(el => el.id == id)
-            const users = usersElement[1].querySelectorAll('option')
+            const item = todo.find(el => el.id == id)
+
             modalEditElement.querySelector('.modal-content__title').value = item.title
             modalEditElement.querySelector('.modal-content__description').value = item.description
-            for (let el = 0; el < users.length; el++) {
-                if (users[el].text == item.user) {
-                    users[el].selected = true
-                }
-            }
+            modalEditElement.querySelector('#btn-select-user').value = item.user
 
             var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
                 keyboard: false
@@ -354,42 +354,73 @@ function handleClickButtonEditItem(event) {
 
             const titleCardElement = modalEditElement.querySelector('.modal-content__title')
             const descriptionCardElement = modalEditElement.querySelector('.modal-content__description')
-            const userCardValueElement = document.querySelectorAll('#btn-select-user')
-            userCardValueElement[1].options[userCardValueElement[1].selectedIndex].selected = true
-            const user = userCardValueElement[1].options[userCardValueElement[1].selectedIndex].text
-            alert(user)
+            const user = modalEditElement.querySelector('#btn-select-user')
+
             modalEditElement.addEventListener('submit', function () {
                 item.title = titleCardElement.value
                 item.description = descriptionCardElement.value
-                item.user = user
-                alert(user)
-                alert(item.user)
+                item.user = user.value
                 updateLocalStorageTodo()
                 renderTodo()
-                modalEditElement.reset()
+            })
+        } else if (target.closest('.card-in-progress')) {
+
+            const closestElement = target.closest('.card-in-progress')
+            const id = closestElement.id
+            const item = inProgress.find(el => el.id == id)
+
+            modalEditElement.querySelector('.modal-content__title').value = item.title
+            modalEditElement.querySelector('.modal-content__description').value = item.description
+            modalEditElement.querySelector('#btn-select-user').value = item.user
+
+            var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
+                keyboard: false
+            })
+            myModal.show()
+
+            const titleCardElement = modalEditElement.querySelector('.modal-content__title')
+            const descriptionCardElement = modalEditElement.querySelector('.modal-content__description')
+            const user = modalEditElement.querySelector('#btn-select-user')
+
+            modalEditElement.addEventListener('submit', function () {
+                item.title = titleCardElement.value
+                item.description = descriptionCardElement.value
+                item.user = user.value
+                updateLocalStorageInProgress()
+                renderInProgress()
+            })
+        } else if (target.closest('.card-done')) {
+
+            const closestElement = target.closest('.card-done')
+            const id = closestElement.id
+            const item = done.find(el => el.id == id)
+
+            modalEditElement.querySelector('.modal-content__title').value = item.title
+            modalEditElement.querySelector('.modal-content__description').value = item.description
+            modalEditElement.querySelector('#btn-select-user').value = item.user
+
+            var myModal = new bootstrap.Modal(document.querySelector('.modal-edit'), {
+                keyboard: false
+            })
+            myModal.show()
+
+            const titleCardElement = modalEditElement.querySelector('.modal-content__title')
+            const descriptionCardElement = modalEditElement.querySelector('.modal-content__description')
+            const user = modalEditElement.querySelector('#btn-select-user')
+
+            modalEditElement.addEventListener('submit', function () {
+                item.title = titleCardElement.value
+                item.description = descriptionCardElement.value
+                item.user = user.value
+                updateLocalStorageDone()
+                renderDone()
             })
         }
     }
-    /*
-            else if (target.closest('.card-in-progress')) {
-                const closestElement = target.closest('.card-in-progress')
-                const id = closestElement.id
-                removeInProgressById(id)
-                updateLocalStorageInProgress()
-                renderInProgress()
-            }
-    
-            else if (target.closest('.card-done')) {
-                const closestElement = target.closest('.card-done')
-                const id = closestElement.id
-                removeDoneById(id)
-                updateLocalStorageDone()
-                renderDone()
-            }*/
 }
 
 // Обработчик события смену колонки у карточки
-function handleClickButtonChangeColumnItem (event) {
+function handleClickButtonChangeColumnItem(event) {
     const target = event.target
     if (target.classList.contains('btn-select')) {
 
@@ -409,13 +440,20 @@ function handleClickButtonChangeColumnItem (event) {
                     count++
                 })
                 if (columns.selectedIndex == 1) {
-                    todo.splice(index, 1)
-                    inProgress.push(item)
-                    updateLocalStorageTodo()
-                    updateLocalStorageInProgress()
-                    renderTodo()
-                    renderInProgress()
-                } 
+                    if (inProgress.length == 3) {
+                        var myModal = new bootstrap.Modal(document.querySelector('.modal-in-progress'), {
+                            keyboard: false
+                        })
+                        myModal.show()
+                    } else {
+                        todo.splice(index, 1)
+                        inProgress.push(item)
+                        updateLocalStorageTodo()
+                        updateLocalStorageInProgress()
+                        renderTodo()
+                        renderInProgress()
+                    }
+                }
                 else if (columns.selectedIndex == 2) {
                     todo.splice(index, 1)
                     done.push(item)
@@ -483,22 +521,47 @@ function handleClickButtonChangeColumnItem (event) {
                     renderTodo()
                 }
                 else if (columns.selectedIndex == 1) {
-                    done.splice(index, 1)
-                    inProgress.push(item)
-                    updateLocalStorageDone()
-                    updateLocalStorageInProgress()
-                    renderDone()
-                    renderInProgress()
+                    if (inProgress.length == 3) {
+                        var myModal = new bootstrap.Modal(document.querySelector('.modal-in-progress'), {
+                            keyboard: false
+                        })
+                        myModal.show()
+                    } else {
+                        done.splice(index, 1)
+                        inProgress.push(item)
+                        updateLocalStorageDone()
+                        updateLocalStorageInProgress()
+                        renderDone()
+                        renderInProgress()
+                    }
                 }
             }
         }
     }
 }
 
+function handleDeleteAllCard(event) {
+    var myModal = new bootstrap.Modal(document.querySelector('.modal-delete-all'), {
+        keyboard: false
+    })
+    myModal.show()
+
+    modalDeleteAllElement.addEventListener('submit', function () {
+        event.preventDefault()
+        done.length = 0
+        updateLocalStorageDone()
+        renderDone()
+    })
+}
+
+function handleEditSelectedItem(event) {
+    const target = event.target
 
 
+}
 
 modalAddElement.addEventListener('submit', handleAddCard)
+buttonDelAllItemElement.addEventListener('click', handleDeleteAllCard)
 cardsTodoElement.addEventListener('click', handleClickButtonRemoveItem)
 allCardsElement.addEventListener('click', handleClickButtonRemoveItem)
 allCardsElement.addEventListener('click', handleClickButtonEditItem)
@@ -510,5 +573,5 @@ window.addEventListener('DOMContentLoaded', handleClock)
 
 
 renderTodo()
- renderInProgress()
- renderDone()
+renderInProgress()
+renderDone()
