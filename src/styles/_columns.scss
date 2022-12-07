@@ -45,7 +45,7 @@
 }
 
 .card__control {
-    @include flexible(center, center);
+    @include flexible(space-between, center);
 
     margin: 10px 0;
 }
