@@ -1,1 +1,1 @@
-# Coursework in TeachMeSkills.
+# Course work in TeachMeSkills.
